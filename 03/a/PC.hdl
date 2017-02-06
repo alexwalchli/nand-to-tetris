@@ -16,22 +16,12 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // memory
-    Register(in=in,load=load,out=memory);
+    Inc16(in=m, out=n);
 
-    // reset
-    Mux(a=in, b=False, sel=reset, out=maybeReset);
+    // conditional logic
+    Mux16(a=l, b=n, sel=inc, out=o);
+    Mux16(a=o, b=in, sel=load, out=p);
+    Mux16(a=p, b=false, sel=reset, out=q);
 
-    // increment
-    Inc16(in=in,out=incremented);
-
-    // reset or increment
-    Mux(a=maybeReset, b=incremented, sel=inc, out=maybeResetOrIncrement);
-
-    // final else
-    Nand(a=reset,b=load,out=notResetAndLoad);
-    Nand(a=notResetAndLoad,b=inc, out=notResetAndLoadAndIncrement);
-
-    // choose between the resetOrIncrement or from memory
-    Mux(a=maybeResetOrIncrement, b=memory, sel=notResetAndLoadAndIncrement,out=out);
+    Register(in=q, load=true, out=out, out=l, out=m);
 }
